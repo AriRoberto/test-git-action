@@ -34,3 +34,22 @@ test("GET / retorna uma mensagem da aplicacao", async () => {
   assert.equal(response.status, 200);
   assert.match(await response.text(), /GitHub Actions/);
 });
+
+test("GET /greet personaliza a saudacao com o nome informado", async () => {
+  const response = await fetch(`${baseUrl}/greet?name=Ari`);
+
+  assert.equal(response.status, 200);
+  assert.equal(
+    await response.text(),
+    "Ola, Ari! Bem-vindo a aplicacao de exemplo.",
+  );
+});
+
+test("GET /greet usa visitante quando o nome nao e informado", async () => {
+  const response = await fetch(`${baseUrl}/greet`);
+
+  assert.equal(
+    await response.text(),
+    "Ola, visitante! Bem-vindo a aplicacao de exemplo.",
+  );
+});

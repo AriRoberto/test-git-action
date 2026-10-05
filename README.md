@@ -13,7 +13,7 @@ npm test
 npm start
 ```
 
-Abra `http://localhost:3000` para ver a aplicacao ou `http://localhost:3000/health` para consultar o endpoint de saude. Os testes e a verificacao de sintaxe tambem serao executados pelo GitHub Actions.
+Abra `http://localhost:3000` para ver a aplicacao, `http://localhost:3000/health` para consultar o endpoint de saude ou `http://localhost:3000/greet?name=Ari` para receber uma saudacao personalizada. Os testes e a verificacao de sintaxe tambem serao executados pelo GitHub Actions.
 
 ## 2. Crie um repositorio no GitHub
 

@@ -1,10 +1,19 @@
 const http = require("node:http");
+const { createGreeting } = require("./greeting");
 
 function createServer() {
   return http.createServer((request, response) => {
-    if (request.url === "/health") {
+    const requestUrl = new URL(request.url, "http://localhost");
+
+    if (requestUrl.pathname === "/health") {
       response.writeHead(200, { "content-type": "application/json" });
       response.end(JSON.stringify({ status: "ok" }));
+      return;
+    }
+
+    if (requestUrl.pathname === "/greet") {
+      response.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
+      response.end(createGreeting(requestUrl.searchParams.get("name")));
       return;
     }
 
