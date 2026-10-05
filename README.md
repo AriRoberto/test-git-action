@@ -127,3 +127,21 @@ npm audit --audit-level=high
 ```
 
 O GitHub Actions executa esses mesmos passos em uma maquina hospedada, sem depender do seu computador estar ligado.
+
+## Executar com Docker
+
+Com o Docker instalado e em execucao, crie a imagem na pasta do projeto:
+
+```bash
+docker build -t demo-github-actions .
+```
+
+Inicie o container e publique a porta 3000 da aplicacao na mesma porta da sua maquina:
+
+```bash
+docker run --rm -p 3000:3000 demo-github-actions
+```
+
+Acesse `http://localhost:3000`, `http://localhost:3000/health` ou `http://localhost:3000/greet?name=Ari`. Para parar o container, pressione `Ctrl+C`.
+
+O Dockerfile usa Node.js 24 Alpine, instala apenas dependencias de producao e executa o processo como o usuario sem privilegios `node`.
