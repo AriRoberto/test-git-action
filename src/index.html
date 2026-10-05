@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Uma aplicação demonstrativa para aprender CI/CD, GitHub Actions e DevSecOps."
+    />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Forge CI — DevSecOps na prática</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: #0b1020;
+        color: #edf2ff;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --muted: #9ba8c7;
+        --line: rgb(173 190 230 / 14%);
+        --surface: rgb(19 28 52 / 78%);
+        --mint: #68e4bd;
+        --blue: #7ca7ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 14% 0%, rgb(47 91 179 / 24%), transparent 38rem),
+          radial-gradient(ellipse at 92% 24%, rgb(29 155 128 / 13%), transparent 32rem),
+          #0b1020;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 40px));
+        margin-inline: auto;
+      }
+
+      .topbar {
+        display: flex;
+        min-height: 76px;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand,
+      .brand-mark,
+      .nav,
+      .status {
+        display: flex;
+        align-items: center;
+      }
+
+      .brand {
+        gap: 12px;
+        font-size: 15px;
+        font-weight: 750;
+        letter-spacing: -0.03em;
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+        border: 1px solid rgb(104 228 189 / 30%);
+        border-radius: 12px;
+        background: rgb(104 228 189 / 10%);
+        color: var(--mint);
+        font-size: 18px;
+      }
+
+      .brand span:last-child {
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .nav {
+        gap: 25px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .nav a {
+        text-decoration: none;
+      }
+
+      .nav a:hover,
+      .text-link:hover {
+        color: white;
+      }
+
+      .hero {
+        display: grid;
+        min-height: 390px;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 44px;
+        padding-block: 70px 58px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--mint);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentcolor;
+        box-shadow: 0 0 16px currentcolor;
+        content: "";
+      }
+
+      h1 {
+        max-width: 650px;
+        margin: 18px 0;
+        font-size: clamp(40px, 6vw, 68px);
+        letter-spacing: -0.065em;
+        line-height: 1.04;
+      }
+
+      h1 span {
+        color: var(--mint);
+      }
+
+      .hero-copy {
+        max-width: 530px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 27px;
+      }
+
+      .button {
+        display: inline-flex;
+        min-height: 43px;
+        align-items: center;
+        justify-content: center;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgb(255 255 255 / 4%);
+        color: #edf2ff;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          transform 160ms ease,
+          border-color 160ms ease,
+          background 160ms ease;
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        border-color: rgb(173 190 230 / 35%);
+      }
+
+      .button-primary {
+        border-color: transparent;
+        background: var(--mint);
+        color: #09251e;
+      }
+
+      .button-primary:hover {
+        background: #87f0cf;
+      }
+
+      .terminal {
+        overflow: hidden;
+        border: 1px solid rgb(173 190 230 / 18%);
+        border-radius: 16px;
+        background: rgb(10 15 30 / 82%);
+        box-shadow: 0 26px 90px rgb(0 0 0 / 32%);
+        transform: rotate(1deg);
+      }
+
+      .terminal-bar {
+        display: flex;
+        height: 45px;
+        align-items: center;
+        gap: 7px;
+        padding-inline: 15px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .window-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #f08080;
+      }
+
+      .window-dot:nth-child(2) {
+        background: #f3c969;
+      }
+
+      .window-dot:nth-child(3) {
+        background: var(--mint);
+      }
+
+      .terminal-title {
+        margin-left: 8px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .terminal-body {
+        padding: 23px 22px 26px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        line-height: 2.1;
+      }
+
+      .terminal-line {
+        color: var(--muted);
+      }
+
+      .terminal-line strong {
+        color: var(--mint);
+        font-weight: 500;
+      }
+
+      .terminal-line .blue {
+        color: var(--blue);
+      }
+
+      .terminal-result {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 18px;
+        padding: 11px 12px;
+        border: 1px solid rgb(104 228 189 / 20%);
+        border-radius: 9px;
+        background: rgb(104 228 189 / 7%);
+        color: #d9fff3;
+        font-family: inherit;
+        font-size: 11px;
+      }
+
+      .check {
+        display: inline-grid;
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--mint);
+        color: #09251e;
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .section {
+        padding-block: 28px 54px;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 19px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 21px;
+        letter-spacing: -0.04em;
+      }
+
+      .section-heading p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .text-link {
+        color: var(--blue);
+        font-size: 12px;
+        text-decoration: none;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .card {
+        min-height: 180px;
+        padding: 19px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--surface);
+      }
+
+      .card-icon {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgb(255 255 255 / 4%);
+        font-size: 16px;
+      }
+
+      .card h3 {
+        margin: 17px 0 7px;
+        font-size: 14px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .demo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 30px;
+        padding: 23px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(120deg, rgb(20 34 57 / 92%), rgb(17 27 47 / 75%));
+      }
+
+      .demo h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        letter-spacing: -0.035em;
+      }
+
+      .demo p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .greeting-form {
+        display: flex;
+        gap: 9px;
+      }
+
+      .greeting-form input {
+        width: 100%;
+        min-width: 0;
+        height: 43px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        outline: none;
+        background: rgb(8 13 26 / 70%);
+        color: #edf2ff;
+        font: inherit;
+        font-size: 13px;
+      }
+
+      .greeting-form input:focus {
+        border-color: var(--mint);
+        box-shadow: 0 0 0 3px rgb(104 228 189 / 12%);
+      }
+
+      .greeting-result {
+        min-height: 20px;
+        margin-top: 9px !important;
+        color: var(--mint) !important;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding-block: 22px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .status {
+        gap: 8px;
+      }
+
+      @media (max-width: 760px) {
+        .nav {
+          gap: 13px;
+        }
+
+        .nav a:nth-child(2) {
+          display: none;
+        }
+
+        .hero {
+          min-height: unset;
+          grid-template-columns: 1fr;
+          gap: 34px;
+          padding-block: 58px 38px;
+        }
+
+        .terminal {
+          transform: none;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .card {
+          min-height: unset;
+        }
+
+        .demo {
+          grid-template-columns: 1fr;
+          gap: 19px;
+        }
+      }
+
+      @media (max-width: 440px) {
+        .shell {
+          width: min(100% - 28px, 1120px);
+        }
+
+        .nav a:first-child {
+          display: none;
+        }
+
+        .section-heading {
+          align-items: start;
+        }
+
+        .greeting-form {
+          flex-direction: column;
+        }
+
+        .greeting-form .button {
+          width: 100%;
+        }
+
+        footer {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="shell topbar">
+      <a class="brand" href="/" aria-label="Forge CI, página inicial">
+        <span class="brand-mark" aria-hidden="true">⌘</span>
+        Forge CI <span>/ DevSecOps Lab</span>
+      </a>
+      <nav class="nav" aria-label="Navegação principal">
+        <a href="#pipeline">Pipeline</a>
+        <a href="#pratica">Prática</a>
+        <a href="/health">Status da API</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="shell hero" aria-labelledby="hero-title">
+        <div>
+          <span class="eyebrow">Seu laboratório de CI/CD</span>
+          <h1 id="hero-title">Código melhor.<br /><span>Entrega segura.</span></h1>
+          <p class="hero-copy">
+            Uma aplicação simples para experimentar automação, testes e segurança
+            com GitHub Actions. Faça uma mudança, envie para o GitHub e acompanhe
+            cada etapa do pipeline.
+          </p>
+          <div class="actions">
+            <a class="button button-primary" href="#pratica">Experimentar a aplicação <span aria-hidden="true">→</span></a>
+            <a class="button" href="/health">Verificar saúde da API</a>
+          </div>
+        </div>
+
+        <div class="terminal" aria-label="Exemplo de execução do pipeline">
+          <div class="terminal-bar" aria-hidden="true">
+            <span class="window-dot"></span>
+            <span class="window-dot"></span>
+            <span class="window-dot"></span>
+            <span class="terminal-title">github-actions / ci.yml</span>
+          </div>
+          <div class="terminal-body">
+            <div class="terminal-line"><span class="blue">➜</span> workflow: <strong>CI</strong></div>
+            <div class="terminal-line"><span class="blue">➜</span> trigger: <strong>push · pull_request</strong></div>
+            <div class="terminal-line"><span class="blue">➜</span> runner: <strong>ubuntu-latest</strong></div>
+            <div class="terminal-result"><span class="check">✓</span> Testes e auditoria concluídos</div>
+            <div class="terminal-line">4 testes passaram <strong>·</strong> 0 vulnerabilidades</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="shell section" id="pipeline" aria-labelledby="pipeline-title">
+        <div class="section-heading">
+          <div>
+            <h2 id="pipeline-title">Do commit à confiança</h2>
+            <p>O pipeline automatiza verificações a cada mudança no código.</p>
+          </div>
+          <a class="text-link" href="/health">API operacional ↗</a>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <span class="card-icon" aria-hidden="true">⌘</span>
+            <h3>Integração contínua</h3>
+            <p>Cada push e pull request inicia um fluxo de trabalho no GitHub Actions.</p>
+          </article>
+          <article class="card">
+            <span class="card-icon" aria-hidden="true">✓</span>
+            <h3>Testes automáticos</h3>
+            <p>Testes e verificação de sintaxe ajudam a encontrar problemas antes do merge.</p>
+          </article>
+          <article class="card">
+            <span class="card-icon" aria-hidden="true">盾</span>
+            <h3>Segurança desde o início</h3>
+            <p>A auditoria de dependências procura vulnerabilidades conhecidas no projeto.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="shell section" id="pratica" aria-labelledby="practice-title">
+        <div class="demo">
+          <div>
+            <h2 id="practice-title">Teste uma funcionalidade</h2>
+            <p>Digite seu nome. Esta demonstração consulta a rota da aplicação e mostra a resposta.</p>
+          </div>
+          <div>
+            <form class="greeting-form" id="greeting-form">
+              <label class="visually-hidden" for="name">Seu nome</label>
+              <input id="name" name="name" maxlength="50" placeholder="Por exemplo, Ari" autocomplete="given-name" />
+              <button class="button button-primary" type="submit">Gerar saudação</button>
+            </form>
+            <p class="greeting-result" id="greeting-result" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <span>Feito para aprender fazendo · Forge CI</span>
+      <span class="status"><span class="check">✓</span> Serviços disponíveis</span>
+    </footer>
+
+    <style>
+      .visually-hidden {
+        position: absolute;
+        overflow: hidden;
+        width: 1px;
+        height: 1px;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        clip-path: inset(50%);
+      }
+    </style>
+    <script>
+      const greetingForm = document.querySelector("#greeting-form");
+      const greetingResult = document.querySelector("#greeting-result");
+
+      greetingForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        greetingResult.textContent = "Carregando...";
+
+        try {
+          const name = new FormData(greetingForm).get("name");
+          const response = await fetch(`/greet?name=${encodeURIComponent(name)}`);
+
+          if (!response.ok) {
+            throw new Error(`A API respondeu com status ${response.status}`);
+          }
+
+          greetingResult.textContent = await response.text();
+        } catch (error) {
+          greetingResult.textContent = "Não foi possível obter a saudação. Tente novamente.";
+          console.error(error);
+        }
+      });
+    </script>
+  </body>
+</html>

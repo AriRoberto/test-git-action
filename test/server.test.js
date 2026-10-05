@@ -28,11 +28,12 @@ test("GET /health retorna status ok em JSON", async () => {
   assert.deepEqual(await response.json(), { status: "ok" });
 });
 
-test("GET / retorna uma mensagem da aplicacao", async () => {
+test("GET / retorna a pagina HTML da aplicacao", async () => {
   const response = await fetch(baseUrl);
 
   assert.equal(response.status, 200);
-  assert.match(await response.text(), /GitHub Actions/);
+  assert.match(response.headers.get("content-type"), /text\/html/);
+  assert.match(await response.text(), /Código melhor/);
 });
 
 test("GET /greet personaliza a saudacao com o nome informado", async () => {
